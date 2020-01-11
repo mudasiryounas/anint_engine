@@ -116,4 +116,4 @@ class AppUtils:
                                      insert_date=datetime.utcnow())
             db_session.add(app_history)
             db_session.commit()
-            print(f"Following app is updated and a new record for history is added, app: '{package}'")
+            print(f"Following app is updated and history is added, app: '{package}'")

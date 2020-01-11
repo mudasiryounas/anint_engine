@@ -9,3 +9,5 @@ class PlaystoreUtils:
     def get_app_latest_info(package):
         app = play_scraper.details(package)
         return app
+
+
