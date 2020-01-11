@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
 # Copyright (C) 2020 Android Intelligence - All Rights Reserved
 # Unauthorized copying of this file, via any medium is strictly prohibited
 # Proprietary and confidential
@@ -36,15 +34,7 @@ def proccess_manifest_file(folder_path):
     manifest_file_path = folder_path + '/AndroidManifest.xml'
     print(f"Processing manifest file from folder: '{manifest_file_path}'")
     root = ET.parse(manifest_file_path).getroot()
-    package = root.get('package')
     platform_build_version_code = root.get('platformBuildVersionCode')
     platform_build_version_name = root.get('platformBuildVersionName')
 
-    application = db_session.query(Apps).filter_by(package=package).first()
-    if application is None:
-        url = f'https://play.google.com/store/apps/details?id={package}'
-        application = Apps(package=package, platform_build_version_code=platform_build_version_code, platform_build_version_name=platform_build_version_name,
-                                   url=url, insert_date=datetime.utcnow(), update_date=datetime.utcnow())
-        db_session.add(application)
-        db_session.commit()
     print("processing manifest file finished.")
