@@ -4,7 +4,7 @@
 
 from _datetime import datetime
 
-from sqlalchemy import Column, Integer, Float, String, DateTime, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, Float, String, DateTime, Boolean, JSON, ForeignKey
 
 from core import db_base
 
@@ -23,21 +23,31 @@ class Apps(db_base):
     package = Column(String(), unique=True)
     platform_build_version_code = Column(String())
     platform_build_version_name = Column(String())
-    name = Column(String())
-    category = Column(String())
-    developer_name = Column(String())
+    title = Column(String())
+    developer_id = Column(String())
     developer_email = Column(String())
-    developer_website = Column(String())
+    developer = Column(String())
+    developer_url = Column(String())
+    developer_address = Column(String())
     description = Column(String())
-    rating = Column(Float())
-    reviews = Column(String())
-    logo = Column(String())
+    recent_changes = Column(String())
+    editors_choice = Column(Boolean())
+    video = Column(String())
+    score = Column(String())
+    reviews = Column(Integer())
+    icon = Column(String())
     price = Column(String())
     url = Column(String())
     updated = Column(String())
-    version = Column(String())
+    current_version = Column(String())
     free = Column(Boolean())
+    size = Column(String())
+    installs = Column(String())
     published = Column(Boolean())
+    required_android_version = Column(String())
+    content_rating = Column(String())
+    iap_range = Column(String())
+    interactive_elements = Column(String())
     insert_date = Column(DateTime(), default=datetime.utcnow())
     update_date = Column(DateTime(), onupdate=datetime.utcnow())
 
@@ -47,24 +57,35 @@ class AppHistory(db_base):
     id = Column(Integer(), primary_key=True)
     insert_date = Column(DateTime(), default=datetime.utcnow())
     app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
-    version = Column(String())
-    updated = Column(String())
     package = Column(String())
     platform_build_version_code = Column(String())
     platform_build_version_name = Column(String())
-    name = Column(String())
-    category = Column(String())
-    developer_name = Column(String())
+    title = Column(String())
+    developer_id = Column(String())
     developer_email = Column(String())
-    developer_website = Column(String())
+    developer = Column(String())
+    developer_url = Column(String())
+    developer_address = Column(String())
     description = Column(String())
-    rating = Column(String())
-    reviews = Column(String())
-    logo = Column(String())
+    recent_changes = Column(String())
+    editors_choice = Column(Boolean())
+    video = Column(String())
+    score = Column(String())
+    reviews = Column(Integer())
+    icon = Column(String())
     price = Column(String())
     url = Column(String())
+    updated = Column(String())
+    current_version = Column(String())
     free = Column(Boolean())
+    size = Column(String())
+    installs = Column(String())
     published = Column(Boolean())
+    required_android_version = Column(String())
+    content_rating = Column(String())
+    iap_range = Column(String())
+    interactive_elements = Column(String())
+    messages = Column(String())
 
 
 class AppImages(db_base):
@@ -74,6 +95,12 @@ class AppImages(db_base):
     image_url = Column(String())
     insert_date = Column(DateTime(), default=datetime.utcnow())
 
+class AppCategories(db_base):
+    __tablename__ = 'app_categories'
+    id = Column(Integer(), primary_key=True)
+    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
+    category = Column(String())
+    insert_date = Column(DateTime(), default=datetime.utcnow())
 
 class AppSDKs():
     __tablename__ = 'app_sdks'

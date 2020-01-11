@@ -1,8 +1,6 @@
 # Copyright (C) 2020 Android Intelligence - All Rights Reserved
 # Unauthorized copying of this file, via any medium is strictly prohibited
 # Proprietary and confidential
-from core import db_session
-from core.db_models import Apps
 from core.utils.app_utils import AppUtils
 from core.utils.playstore_utils import PlaystoreUtils
 
@@ -17,7 +15,7 @@ def check_for_app_updates(package):
     else:
         # check if application version is updated from playstore
         latest_playstore_app = PlaystoreUtils.get_app_latest_info(package)
-        if current_app_on_db.version != latest_playstore_app.version:
+        if current_app_on_db.current_version != latest_playstore_app['current_version']:
             # if application version is updated, process latest apk
             print(f"New version is detected for app: '{package}'")
             continue_job = True
