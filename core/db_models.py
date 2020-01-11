@@ -10,6 +10,13 @@ from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
 
 from core import db_base
 
+class AppsToFollow(db_base):
+    __tablename__ = 'apps_to_follow'
+    id = Column(Integer(), primary_key=True)
+    package = Column(String(), unique=True, nullable=False)
+    insert_date = Column(DateTime(), default=datetime.utcnow())
+    update_date = Column(DateTime(), onupdate=datetime.utcnow())
+
 
 class Apps(db_base):
     __tablename__ = 'apps'
@@ -18,11 +25,39 @@ class Apps(db_base):
     platform_build_version_code = Column(String())
     platform_build_version_name = Column(String())
     name = Column(String())
+    category = Column(String())
+    developer_name = Column(String())
+    developer_email = Column(String())
+    developer_website = Column(String())
+    description = Column(String())
+    rating = Column(String())
+    reviews = Column(String())
+    logo = Column(String())
+    price = Column(String())
     url = Column(String())
+    updated = Column(String())
+    current_version = Column(String())
+    free = Column(Boolean())
     published = Column(Boolean())
     insert_date = Column(DateTime(), default=datetime.utcnow())
     update_date = Column(DateTime(), onupdate=datetime.utcnow())
 
+
+class AppsDetail(db_base):
+    __tablename__ = 'apps_detail'
+    id = Column(Integer(), primary_key=True)
+    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
+    image = Column(String())
+    insert_date = Column(DateTime(), default=datetime.utcnow())
+
+class AppsHistory(db_base):
+    __tablename__ = 'apps_history'
+    id = Column(Integer(), primary_key=True)
+    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
+    version = Column(String())
+    updated = Column(String())
+    insert_date = Column(DateTime(), default=datetime.utcnow())
+    update_date = Column(DateTime(), onupdate=datetime.utcnow())
 
 class Urls(db_base):
     __tablename__ = 'urls'

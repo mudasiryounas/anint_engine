@@ -4,5 +4,5 @@
 # Unauthorized copying of this file, via any medium is strictly prohibited
 # Proprietary and confidential
 
-if __name__ == '__main__':
-    file_path = '/tmp/anint/mys3chat/mys3chat.apk'
+class CoreUtils:
+    pass
