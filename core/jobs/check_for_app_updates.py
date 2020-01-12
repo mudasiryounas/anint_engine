@@ -3,10 +3,20 @@
 # Proprietary and confidential
 import time
 
+from core import db_session
 from core.Enums import AppsToFollowStatus
+from core.db_models import AppsToFollow
 from core.utils.app_utils import AppUtils
 from core.utils.apps_to_follow_utils import AppsToFollowUtils
 from core.utils.playstore_utils import PlaystoreUtils
+
+
+def check_for_all_app_updates():
+    apps_to_follow = db_session.query(AppsToFollow).all()
+    apps_to_follow_packages = [item.package for item in apps_to_follow]
+    print(f"Adding '{len(apps_to_follow_packages)}' apps to queue for checking updates")
+    for package in apps_to_follow_packages:
+        check_for_app_updates(package)
 
 
 def check_for_app_updates(package):
@@ -41,4 +51,4 @@ def check_for_app_updates(package):
 
 
 if __name__ == '__main__':
-    check_for_app_updates('com.mys3soft.mys3chat')
+    check_for_all_app_updates()

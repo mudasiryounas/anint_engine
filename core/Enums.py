@@ -15,6 +15,8 @@ class AppsToFollowStatus(Enum):
     PROCESSING = 8
     PROCESSED = 9
 
+    ERROR = 99
+
 
 class LogType(Enum):
     DOWNLOAD = 'DOWNLOAD'
