@@ -18,7 +18,6 @@ def job_scheduler_daemon():
             apps_to_follow_packages = [item.package for item in apps_to_follow]
             print(f"Adding '{len(apps_to_follow_packages)}' apps to queue for checking updates")
             for package in apps_to_follow_packages:
-                # todo make it queue
                 check_for_app_updates(package)
             print(f"Sleeping for '{sleep_seconds}' seconds before triggering a new jobs")
             time.sleep(sleep_seconds)

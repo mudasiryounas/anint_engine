@@ -13,6 +13,10 @@ class AppsToFollow(db_base):
     __tablename__ = 'apps_to_follow'
     id = Column(Integer(), primary_key=True)
     package = Column(String(), unique=True, nullable=False)
+    last_version = Column(String())
+    current_version = Column(String())
+    status = Column(Integer())
+    inserted_by = Column(String())
     insert_date = Column(DateTime(), default=datetime.utcnow())
     update_date = Column(DateTime(), onupdate=datetime.utcnow())
 
