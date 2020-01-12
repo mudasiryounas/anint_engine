@@ -10,6 +10,7 @@ from datetime import datetime
 from core import db_session
 from core.Enums import AppsToFollowStatus, ContentStatus
 from core.db_models import AppsToFollow, AppContents
+from core.utils.tools import Tools
 from core.utils.app_utils import AppUtils
 
 DECOMPILED_FILES_FOLDER = '/tmp/anint/decompiled_apks'
@@ -56,6 +57,7 @@ def process_manifest_file(package, folder_path):
 
 def process_other_files(package, folder_path):
     # save files to 'contents' table to be processed by IOC 'step_4_check_for_contents_to_process'
+    files_processing_start_time = time.time()
     app = AppUtils.get_app(package)
     app_id = app.id
     app_version = app.current_version
@@ -98,8 +100,7 @@ def process_other_files(package, folder_path):
                     db_session.commit()
                     db_commit_checkpoint = 0
     db_session.commit()
-
-    print(f"Processing other files finished for app: '{package}'")
+    print(f"Processing other files finished for app: '{package}', Took '{Tools.get_elapsed_time(files_processing_start_time)}' seconds")
 
 
 def process_app(package, version):
@@ -111,7 +112,7 @@ def process_app(package, version):
     apps_to_follow = db_session.query(AppsToFollow).filter_by(package=package).first()
     apps_to_follow.status = AppsToFollowStatus.PROCESSED.value
     db_session.commit()
-    print(f"Processing finished for app: '{package}', version: '{version}', Took '{round((time.time() - processing_start_time), 4)}' seconds")
+    print(f"Processing finished for app: '{package}', version: '{version}', Took '{Tools.get_elapsed_time(processing_start_time)}' seconds")
 
 
 def main():
@@ -125,7 +126,7 @@ def main():
         db_session.commit()
         for package, current_version in apps_to_process_tuple:
             process_app(package, current_version)
-    print(f"Check for apps to process job finished, Took '{round((time.time() - start_time), 4)}' seconds")
+    print(f"Check for apps to process job finished, Took '{Tools.get_elapsed_time(start_time)}' seconds")
 
 
 if __name__ == '__main__':
