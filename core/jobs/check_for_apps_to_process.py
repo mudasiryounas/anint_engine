@@ -20,10 +20,30 @@ def process_manifest_file(package, folder_path):
     platform_build_version_code = root.get('platformBuildVersionCode')
     platform_build_version_name = root.get('platformBuildVersionName')
 
-    permission_list = root.get('uses-permission')
+    permission_list = []
     activity_list = []
     service_list = []
     receiver_list = []
+
+    def __get_value_by_attr_name(item, attr_name):
+        for key, value in item.attrib.items():
+            if key.endswith(attr_name):
+                return value
+
+    for elem in root:
+        if elem.tag == 'uses-permission':
+            permission_list.append(__get_value_by_attr_name(elem, 'name'))
+        elif elem.tag == 'application':
+            for sub_item in elem:
+                if sub_item.tag == 'activity':
+                    activity_list.append(__get_value_by_attr_name(sub_item, 'name'))
+                elif sub_item.tag == 'service':
+                    service_list.append(__get_value_by_attr_name(sub_item, 'name'))
+                elif sub_item.tag == 'receiver':
+                    receiver_list.append(__get_value_by_attr_name(sub_item, 'name'))
+
+
+
 
     AppUtils.add_app_permissions(package, permission_list)
     AppUtils.add_app_activities(package, activity_list)
