@@ -51,12 +51,16 @@ def process_manifest_file(package, folder_path):
     AppUtils.update_app_info(package=package, platform_build_version_code=platform_build_version_code, platform_build_version_name=platform_build_version_name)
     print("processing manifest file finished.")
 
+def process_other_files():
+    # save files to 'contents' table to be processed by IOC
+
 
 def process_app(package, version):
     print(f"Processing started for app: '{package}', version: '{version}'")
     processing_start_time = time.time()
     decompiled_files_output_folder = DECOMPILED_FILES_FOLDER + '/' + package + '/' + version
     process_manifest_file(package, decompiled_files_output_folder)
+    process_other_files(package, decompiled_files_output_folder)
     # update PROCESSED status in db
     apps_to_follow = db_session.query(AppsToFollow).filter_by(package=package).first()
     apps_to_follow.status = AppsToFollowStatus.PROCESSED.value

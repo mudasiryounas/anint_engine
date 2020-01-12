@@ -157,6 +157,15 @@ class AppReceivers(db_base):
     receiver = Column(String())
 
 
+class Contents(db_base):
+    __tablename__ = 'contents'
+    id = Column(Integer(), primary_key=True)
+    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
+    content = Column(String()) # must be maximum of 1 MB for full text search
+    status = Column(Integer())
+    insert_date = Column(DateTime(), default=datetime.utcnow())
+    update_date = Column(DateTime(), onupdate=datetime.utcnow())
+
 class Urls(db_base):
     __tablename__ = 'urls'
     id = Column(Integer(), primary_key=True)

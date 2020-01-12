@@ -15,6 +15,20 @@ class AppsToFollowStatus(Enum):
     PROCESSING = 8
     PROCESSED = 9
 
+    CANCELLED = 97
+    TIMEOUT = 98
+    ERROR = 99
+
+
+class ContentStatus(Enum):
+    WAITING = 1
+    UPLOADING = 2
+    UNPROCESSED = 3
+    PROCESSING = 4
+    PROCESSED = 5
+
+    CANCELLED = 97
+    TIMEOUT = 98
     ERROR = 99
 
 
