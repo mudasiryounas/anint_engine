@@ -11,17 +11,8 @@ from core.utils.apps_to_follow_utils import AppsToFollowUtils
 from core.utils.playstore_utils import PlaystoreUtils
 
 
-def check_for_all_app_updates():
-    apps_to_follow = db_session.query(AppsToFollow).all()
-    apps_to_follow_packages = [item.package for item in apps_to_follow]
-    print(f"Adding '{len(apps_to_follow_packages)}' apps to queue for checking updates")
-    for package in apps_to_follow_packages:
-        check_for_app_updates(package)
-
-
 def check_for_app_updates(package):
     start_time = time.time()
-    print(f"Check for update job started for app: '{package}'")
     current_app_on_db = AppUtils.get_app(package)
     new_version = None
     if current_app_on_db is None:
@@ -39,7 +30,6 @@ def check_for_app_updates(package):
         AppUtils.update_app(package, latest_playstore_app)
 
     if new_version:
-        print(f"Following app will be downloaded, decompiled and processed, app: '{package}', version: '{new_version}'")
         # todo automate downloading process
         # download latest apk
         # decompile latest apk
@@ -50,5 +40,12 @@ def check_for_app_updates(package):
     print(f"Check for update job finished for app: '{package}', Took '{round((time.time() - start_time), 4)}' seconds")
 
 
+def main():
+    apps_to_follow = db_session.query(AppsToFollow).all()
+    apps_to_follow_packages = [item.package for item in apps_to_follow]
+    for package in apps_to_follow_packages:
+        check_for_app_updates(package)
+
+
 if __name__ == '__main__':
-    check_for_all_app_updates()
+    main()

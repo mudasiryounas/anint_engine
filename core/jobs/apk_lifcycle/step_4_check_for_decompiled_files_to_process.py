@@ -2,26 +2,28 @@
 # Unauthorized copying of this file, via any medium is strictly prohibited
 # Proprietary and confidential
 
+import os
 import time
 import xml.etree.ElementTree as ET
+from datetime import datetime
 
 from core import db_session
-from core.Enums import AppsToFollowStatus
-from core.db_models import AppsToFollow
+from core.Enums import AppsToFollowStatus, ContentStatus
+from core.db_models import AppsToFollow, AppContents
 from core.utils.app_utils import AppUtils
 
 DECOMPILED_FILES_FOLDER = '/tmp/anint/decompiled_apks'
 
+EXCLUDED_FILE_EXTENSION = ['png']
+
 
 def process_manifest_file(package, folder_path):
-
     def __get_value_by_attr_name(item, attr_name):
         for key, value in item.attrib.items():
             if key.endswith(attr_name):
                 return value
 
     manifest_file_path = folder_path + '/AndroidManifest.xml'
-    print(f"Processing following manifest file: '{manifest_file_path}'")
     root = ET.parse(manifest_file_path).getroot()
     platform_build_version_code = root.get('platformBuildVersionCode')
     platform_build_version_name = root.get('platformBuildVersionName')
@@ -49,14 +51,54 @@ def process_manifest_file(package, folder_path):
     AppUtils.add_app_receivers(package, receiver_list)
 
     AppUtils.update_app_info(package=package, platform_build_version_code=platform_build_version_code, platform_build_version_name=platform_build_version_name)
-    print("processing manifest file finished.")
+    print(f"processing manifest file finished, for app: '{package}'")
 
-def process_other_files():
-    # save files to 'contents' table to be processed by IOC
+
+
+def process_other_files(package, folder_path):
+    # save files to 'contents' table to be processed by IOC 'step_4_check_for_contents_to_process'
+    app = AppUtils.get_app(package)
+    app_id = app.id
+    app_version = app.current_version
+    db_commit_checkpoint = 0  # commit session after each 1000 new records
+    for subdir, dirs, files in os.walk(folder_path):
+        for file_name in files:
+            if file_name.split('.')[-1] not in EXCLUDED_FILE_EXTENSION:
+                file_full_path = subdir + os.sep + file_name
+                app_level_file_path = file_full_path.replace(folder_path, '')
+                with open(file_full_path, 'rt') as f:
+                    file_content = f.read()
+                each_text_size = 1000000  # 1 MB
+                final_contents_to_save = []
+                if len(file_content) > each_text_size:
+                    print(f"More than 1 MB content found, splitting and saving maximum of 1 MB, app: '{package}', file: '{file_full_path}'")
+                    split_texts = []
+                    for i in range(0, len(file_content), each_text_size):
+                        if i == 0:
+                            split_texts.append(file_content[i:i + each_text_size])
+                        else:
+                            split_texts.append(file_content[i - 200:i + each_text_size])  # keep some words extra in order to not miss any word
+                    for each_content in split_texts:
+                        final_contents_to_save.append(each_content)
+                else:
+                    final_contents_to_save = [file_content]
+                for final_content in final_contents_to_save:
+                    # check for duplicates
+                    app_content = db_session.query(AppContents).filter_by(app_id=app_id, app_version=app_version, content_file=app_level_file_path).first()
+                    if app_content is None:
+                        app_content = AppContents(app_id=app_id, content=final_content, content_file=app_level_file_path, app_version=app_version, content_status=ContentStatus.UNPROCESSED.value, insert_date=datetime.utcnow())
+                        db_session.add(app_content)
+                db_commit_checkpoint += 1
+                if db_commit_checkpoint > 500:
+                    print(f"Committing '500' records...")
+                    db_session.commit()
+                    db_commit_checkpoint = 0
+    db_session.commit()
+
+    print(f"Processing other files finished for app: '{package}'")
 
 
 def process_app(package, version):
-    print(f"Processing started for app: '{package}', version: '{version}'")
     processing_start_time = time.time()
     decompiled_files_output_folder = DECOMPILED_FILES_FOLDER + '/' + package + '/' + version
     process_manifest_file(package, decompiled_files_output_folder)
@@ -68,7 +110,7 @@ def process_app(package, version):
     print(f"Processing finished for app: '{package}', version: '{version}', Took '{round((time.time() - processing_start_time), 4)}' seconds")
 
 
-def check_for_apps_to_process():
+def main():
     start_time = time.time()
     print(f"Check for apps to process job started")
     apps_to_process = db_session.query(AppsToFollow).filter_by(status=AppsToFollowStatus.DECOMPILED.value).all()
@@ -83,4 +125,5 @@ def check_for_apps_to_process():
 
 
 if __name__ == '__main__':
-    process_manifest_file('com.mys3soft.mys3chat', '/tmp/anint/decompiled_apks/com.mys3soft.mys3chat/3.8')
+    # main()
+    process_other_files('com.inovel.app.yemeksepeti', '/tmp/anint/decompiled_apks/com.inovel.app.yemeksepeti/3.1.9')

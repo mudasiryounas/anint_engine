@@ -45,7 +45,6 @@ class AppUtils:
                        required_android_version=ps_app['required_android_version'],
                        content_rating='|'.join(ps_app['content_rating']),
                        iap_range=ps_app['iap_range'],
-                       interactive_elements=ps_app['interactive_elements'],
                        insert_date=datetime.utcnow(),
                        update_date=datetime.utcnow())
 
@@ -68,6 +67,7 @@ class AppUtils:
     def add_app_history(package, app_before_update, messages):
         # keep application history
         if len(messages) > 0:
+            messages = ' | '.join(messages)
             app_history = AppHistory(app_id=app_before_update.id,
                                      package=app_before_update.package,
                                      platform_build_version_code=app_before_update.platform_build_version_code,
@@ -96,12 +96,11 @@ class AppUtils:
                                      required_android_version=app_before_update.required_android_version,
                                      content_rating=app_before_update.content_rating,
                                      iap_range=app_before_update.iap_range,
-                                     interactive_elements=app_before_update.interactive_elements,
-                                     messages=' | '.join(messages),
+                                     messages=messages,
                                      insert_date=datetime.utcnow())
             db_session.add(app_history)
             db_session.commit()
-            print(f"Following app is updated and history is added, app: '{package}'")
+            print(f"Following app is updated and history is added, app: '{package}', messages: '{messages}'")
 
     @staticmethod
     def update_app_info(package, platform_build_version_code=None, platform_build_version_name=None):
@@ -149,7 +148,7 @@ class AppUtils:
     def add_app_permissions(package, permission_list):
         app_id = AppUtils.get_app(package).id
         for permission in permission_list:
-            if db_session.query(AppPermissions).filter_by(permission=permission).first() is None:
+            if db_session.query(AppPermissions).filter_by(app_id=app_id).filter_by(permission=permission).first() is None:
                 app_permission = AppPermissions(app_id=app_id, permission=permission, insert_date=datetime.utcnow())
                 db_session.add(app_permission)
         db_session.commit()
@@ -158,7 +157,7 @@ class AppUtils:
     def add_app_activities(package, activity_list):
         app_id = AppUtils.get_app(package).id
         for activity in activity_list:
-            if db_session.query(AppActivities).filter_by(activity=activity).first() is None:
+            if db_session.query(AppActivities).filter_by(app_id=app_id).filter_by(activity=activity).first() is None:
                 app_activity = AppActivities(app_id=app_id, activity=activity, insert_date=datetime.utcnow())
                 db_session.add(app_activity)
         db_session.commit()
@@ -167,7 +166,7 @@ class AppUtils:
     def add_app_receivers(package, receiver_list):
         app_id = AppUtils.get_app(package).id
         for receiver in receiver_list:
-            if db_session.query(AppReceivers).filter_by(receiver=receiver).first() is None:
+            if db_session.query(AppReceivers).filter_by(app_id=app_id).filter_by(receiver=receiver).first() is None:
                 app_receiver = AppReceivers(app_id=app_id, receiver=receiver, insert_date=datetime.utcnow())
                 db_session.add(app_receiver)
         db_session.commit()
@@ -177,7 +176,7 @@ class AppUtils:
     def add_app_services(package, service_list):
         app_id = AppUtils.get_app(package).id
         for service in service_list:
-            if db_session.query(AppServices).filter_by(service=service).first() is None:
+            if db_session.query(AppServices).filter_by(app_id=app_id).filter_by(service=service).first() is None:
                 app_service = AppServices(app_id=app_id, service=service, insert_date=datetime.utcnow())
                 db_session.add(app_service)
         db_session.commit()

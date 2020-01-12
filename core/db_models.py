@@ -4,7 +4,8 @@
 
 from _datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Index
+from sqlalchemy_utils.types import TSVectorType
 
 from core import db_base
 
@@ -15,7 +16,7 @@ class AppsToFollow(db_base):
     package = Column(String(), unique=True, nullable=False)
     last_version = Column(String())
     current_version = Column(String())
-    status = Column(Integer())
+    app_to_follow_status = Column(Integer())
     inserted_by = Column(String())
     insert_date = Column(DateTime(), default=datetime.utcnow())
     update_date = Column(DateTime(), onupdate=datetime.utcnow())
@@ -33,7 +34,7 @@ class Apps(db_base):
     developer = Column(String())
     developer_url = Column(String())
     developer_address = Column(String())
-    description = Column(String())
+    description = Column(String())  # todo make full text search
     recent_changes = Column(String())
     editors_choice = Column(Boolean())
     video = Column(String())
@@ -51,7 +52,6 @@ class Apps(db_base):
     required_android_version = Column(String())
     content_rating = Column(String())
     iap_range = Column(String())
-    interactive_elements = Column(String())
     insert_date = Column(DateTime(), default=datetime.utcnow())
     update_date = Column(DateTime(), onupdate=datetime.utcnow())
 
@@ -88,8 +88,26 @@ class AppHistory(db_base):
     required_android_version = Column(String())
     content_rating = Column(String())
     iap_range = Column(String())
-    interactive_elements = Column(String())
     messages = Column(String())
+
+
+class AppContents(db_base):
+    __tablename__ = 'app_contents'
+    id = Column(Integer(), primary_key=True)
+    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
+    content = Column(String())  # must be maximum of 1 MB for full text search
+    content_file = Column(String())
+    app_version = Column(String())
+    content_status = Column(Integer())
+    insert_date = Column(DateTime(), default=datetime.utcnow())
+    search_vector = Column(TSVectorType('content'))
+    __table_args__ = (
+        Index(
+            'idx_app_content_search_vector',
+            search_vector,
+            postgresql_using='gin'
+        ),
+    )
 
 
 class AppImages(db_base):
@@ -125,6 +143,7 @@ class AppActivities(db_base):
     app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
     activity = Column(String())
 
+
 class AppServicess(db_base):
     __tablename__ = 'app_servicess'
     id = Column(Integer(), primary_key=True)
@@ -156,15 +175,6 @@ class AppReceivers(db_base):
     app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
     receiver = Column(String())
 
-
-class Contents(db_base):
-    __tablename__ = 'contents'
-    id = Column(Integer(), primary_key=True)
-    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
-    content = Column(String()) # must be maximum of 1 MB for full text search
-    status = Column(Integer())
-    insert_date = Column(DateTime(), default=datetime.utcnow())
-    update_date = Column(DateTime(), onupdate=datetime.utcnow())
 
 class Urls(db_base):
     __tablename__ = 'urls'

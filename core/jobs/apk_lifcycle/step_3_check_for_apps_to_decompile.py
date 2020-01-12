@@ -33,7 +33,7 @@ def decompile_app(package, version):
     print(f"Decompiling finished for app: '{package}', version: '{version}', Took '{round((time.time() - decompile_start_time), 4)}' seconds")
 
 
-def check_for_apps_to_decompile():
+def main():
     start_time = time.time()
     print(f"Check for apps to decompile job started")
     apps_to_decompile = db_session.query(AppsToFollow).filter_by(status=AppsToFollowStatus.DOWNLOADED.value).all()
@@ -48,4 +48,4 @@ def check_for_apps_to_decompile():
 
 
 if __name__ == '__main__':
-    check_for_apps_to_decompile()
+    main()
