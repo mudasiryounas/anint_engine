@@ -14,6 +14,12 @@ DECOMPILED_FILES_FOLDER = '/tmp/anint/decompiled_apks'
 
 
 def process_manifest_file(package, folder_path):
+
+    def __get_value_by_attr_name(item, attr_name):
+        for key, value in item.attrib.items():
+            if key.endswith(attr_name):
+                return value
+
     manifest_file_path = folder_path + '/AndroidManifest.xml'
     print(f"Processing following manifest file: '{manifest_file_path}'")
     root = ET.parse(manifest_file_path).getroot()
@@ -24,11 +30,6 @@ def process_manifest_file(package, folder_path):
     activity_list = []
     service_list = []
     receiver_list = []
-
-    def __get_value_by_attr_name(item, attr_name):
-        for key, value in item.attrib.items():
-            if key.endswith(attr_name):
-                return value
 
     for elem in root:
         if elem.tag == 'uses-permission':
@@ -41,9 +42,6 @@ def process_manifest_file(package, folder_path):
                     service_list.append(__get_value_by_attr_name(sub_item, 'name'))
                 elif sub_item.tag == 'receiver':
                     receiver_list.append(__get_value_by_attr_name(sub_item, 'name'))
-
-
-
 
     AppUtils.add_app_permissions(package, permission_list)
     AppUtils.add_app_activities(package, activity_list)
