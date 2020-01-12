@@ -14,7 +14,7 @@ from core.utils.app_utils import AppUtils
 
 DECOMPILED_FILES_FOLDER = '/tmp/anint/decompiled_apks'
 
-EXCLUDED_FILE_EXTENSION = ['png']
+EXCLUDED_FILE_EXTENSION = ['png', 'webp', 'ttf', 'kotlin_metadata', 'kotlin_builtins', 'kotlin_module', 'RSA', 'gz']
 
 
 def process_manifest_file(package, folder_path):
@@ -54,7 +54,6 @@ def process_manifest_file(package, folder_path):
     print(f"processing manifest file finished, for app: '{package}'")
 
 
-
 def process_other_files(package, folder_path):
     # save files to 'contents' table to be processed by IOC 'step_4_check_for_contents_to_process'
     app = AppUtils.get_app(package)
@@ -67,7 +66,11 @@ def process_other_files(package, folder_path):
                 file_full_path = subdir + os.sep + file_name
                 app_level_file_path = file_full_path.replace(folder_path, '')
                 with open(file_full_path, 'rt') as f:
-                    file_content = f.read()
+                    try:
+                        file_content = f.read()
+                    except Exception as e:
+                        print(f"Exception while reading file: '{file_full_path}', app: '{package}', Exception: '{str(e)}'")
+                        continue
                 each_text_size = 1000000  # 1 MB
                 final_contents_to_save = []
                 if len(file_content) > each_text_size:
@@ -83,14 +86,15 @@ def process_other_files(package, folder_path):
                 else:
                     final_contents_to_save = [file_content]
                 for final_content in final_contents_to_save:
+                    final_content = final_content.replace(chr(0x00), "")
                     # check for duplicates
                     app_content = db_session.query(AppContents).filter_by(app_id=app_id, app_version=app_version, content_file=app_level_file_path).first()
                     if app_content is None:
                         app_content = AppContents(app_id=app_id, content=final_content, content_file=app_level_file_path, app_version=app_version, content_status=ContentStatus.UNPROCESSED.value, insert_date=datetime.utcnow())
                         db_session.add(app_content)
-                db_commit_checkpoint += 1
-                if db_commit_checkpoint > 500:
-                    print(f"Committing '500' records...")
+                        db_commit_checkpoint += 1
+                if db_commit_checkpoint >= 1000:
+                    print(f"Committing '{db_commit_checkpoint}' records...")
                     db_session.commit()
                     db_commit_checkpoint = 0
     db_session.commit()
