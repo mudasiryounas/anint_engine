@@ -5,7 +5,7 @@ import copy
 from datetime import datetime
 
 from core import db_session
-from core.db_models import Apps, AppImages, AppHistory, AppCategories
+from core.db_models import Apps, AppImages, AppHistory, AppCategories, AppPermissions, AppActivities, AppReceivers, AppServices
 from core.utils.playstore_utils import PlaystoreUtils
 
 
@@ -65,24 +65,9 @@ class AppUtils:
             return app
 
     @staticmethod
-    def update_app(package, ps_app):
-        app = db_session.query(Apps).filter_by(package=package).first()
-        app_before_update = copy.deepcopy(app)
-        messages = []
-        exclude_attrs = ['id', 'insert_date', 'update_date', 'metadata', 'package', 'platform_build_version_code', 'platform_build_version_name', 'published']
-        app_attrs = [item for item in dir(app) if not item.startswith('_') and item not in exclude_attrs ]
-        for attr_name in app_attrs:
-            app_attr_value = getattr(app, attr_name)
-            ps_app_attr_value = ps_app[attr_name]
-            if attr_name == 'content_rating':
-                ps_app_attr_value = '|'.join(ps_app_attr_value)
-            if app_attr_value != ps_app_attr_value:
-                messages.append(f"app '{attr_name}' is changed from '{app_attr_value}' to '{ps_app_attr_value}'")
-                setattr(app, attr_name, ps_app_attr_value)
-
+    def add_app_history(package, app_before_update, messages):
         # keep application history
         if len(messages) > 0:
-            app.update_date = datetime.utcnow()
             app_history = AppHistory(app_id=app_before_update.id,
                                      package=app_before_update.package,
                                      platform_build_version_code=app_before_update.platform_build_version_code,
@@ -117,3 +102,82 @@ class AppUtils:
             db_session.add(app_history)
             db_session.commit()
             print(f"Following app is updated and history is added, app: '{package}'")
+
+    @staticmethod
+    def update_app_info(package, platform_build_version_code=None, platform_build_version_name=None):
+        app = db_session.query(Apps).filter_by(package=package).first()
+        app_before_update = copy.deepcopy(app)
+        messages = []
+
+        if app.platform_build_version_code != platform_build_version_code:
+            messages.append(f"app 'platform_build_version_code' is changed from '{app_before_update.platform_build_version_code}' to '{platform_build_version_code}'")
+            app.platform_build_version_code = platform_build_version_code
+        if app.platform_build_version_name != platform_build_version_name:
+            messages.append(f"app 'platform_build_version_name' is changed from '{app_before_update.platform_build_version_name}' to '{platform_build_version_name}'")
+            app.platform_build_version_name = platform_build_version_name
+
+        if len(messages) > 0:
+            app.update_date = datetime.utcnow()
+            db_session.commit()
+            # keep application history
+            AppUtils.add_app_history(package=package, app_before_update=app_before_update, messages=messages)
+
+    @staticmethod
+    def update_app(package, ps_app):
+        app = db_session.query(Apps).filter_by(package=package).first()
+        app_before_update = copy.deepcopy(app)
+        messages = []
+        exclude_attrs = ['id', 'insert_date', 'update_date', 'metadata', 'package', 'platform_build_version_code', 'platform_build_version_name', 'published']
+        app_attrs = [item for item in dir(app) if not item.startswith('_') and item not in exclude_attrs]
+        for attr_name in app_attrs:
+            app_attr_value = getattr(app, attr_name)
+            ps_app_attr_value = ps_app[attr_name]
+            if attr_name == 'content_rating':
+                ps_app_attr_value = '|'.join(ps_app_attr_value)
+            if app_attr_value != ps_app_attr_value:
+                messages.append(f"app '{attr_name}' is changed from '{app_attr_value}' to '{ps_app_attr_value}'")
+                setattr(app, attr_name, ps_app_attr_value)
+
+        # keep application history
+        if len(messages) > 0:
+            app.update_date = datetime.utcnow()
+            db_session.commit()
+            # keep application history
+            AppUtils.add_app_history(package=package, app_before_update=app_before_update, messages=messages)
+
+    @staticmethod
+    def add_app_permissions(package, permission_list):
+        app_id = AppUtils.get_app(package).id
+        for permission in permission_list:
+            if db_session.query(AppPermissions).filter_by(permission=permission).first() is None:
+                app_permission = AppPermissions(app_id=app_id, permission=permission, insert_date=datetime.utcnow())
+                db_session.add(app_permission)
+        db_session.commit()
+
+    @staticmethod
+    def add_app_activities(package, activity_list):
+        app_id = AppUtils.get_app(package).id
+        for activity in activity_list:
+            if db_session.query(AppActivities).filter_by(activity=activity).first() is None:
+                app_activity = AppActivities(app_id=app_id, activity=activity, insert_date=datetime.utcnow())
+                db_session.add(app_activity)
+        db_session.commit()
+
+    @staticmethod
+    def add_app_receivers(package, receiver_list):
+        app_id = AppUtils.get_app(package).id
+        for receiver in receiver_list:
+            if db_session.query(AppReceivers).filter_by(receiver=receiver).first() is None:
+                app_receiver = AppReceivers(app_id=app_id, receiver=receiver, insert_date=datetime.utcnow())
+                db_session.add(app_receiver)
+        db_session.commit()
+
+
+    @staticmethod
+    def add_app_services(package, service_list):
+        app_id = AppUtils.get_app(package).id
+        for service in service_list:
+            if db_session.query(AppServices).filter_by(service=service).first() is None:
+                app_service = AppServices(app_id=app_id, service=service, insert_date=datetime.utcnow())
+                db_session.add(app_service)
+        db_session.commit()

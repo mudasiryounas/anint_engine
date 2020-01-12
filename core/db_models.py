@@ -4,7 +4,7 @@
 
 from _datetime import datetime
 
-from sqlalchemy import Column, Integer, Float, String, DateTime, Boolean, JSON, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
 
 from core import db_base
 
@@ -99,6 +99,7 @@ class AppImages(db_base):
     image_url = Column(String())
     insert_date = Column(DateTime(), default=datetime.utcnow())
 
+
 class AppCategories(db_base):
     __tablename__ = 'app_categories'
     id = Column(Integer(), primary_key=True)
@@ -106,15 +107,54 @@ class AppCategories(db_base):
     category = Column(String())
     insert_date = Column(DateTime(), default=datetime.utcnow())
 
-class AppSDKs():
+
+class AppSDKs(db_base):
     __tablename__ = 'app_sdks'
     id = Column(Integer(), primary_key=True)
     insert_date = Column(DateTime(), default=datetime.utcnow())
-    update_date = Column(DateTime(), onupdate=datetime.utcnow())
     app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
     sdk = Column(String())
     version = Column(String())
     sdk_detail_link = Column(String())
+
+
+class AppActivities(db_base):
+    __tablename__ = 'app_activities'
+    id = Column(Integer(), primary_key=True)
+    insert_date = Column(DateTime(), default=datetime.utcnow())
+    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
+    activity = Column(String())
+
+class AppServicess(db_base):
+    __tablename__ = 'app_servicess'
+    id = Column(Integer(), primary_key=True)
+    insert_date = Column(DateTime(), default=datetime.utcnow())
+    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
+    service = Column(String())
+
+
+class AppPermissions(db_base):
+    __tablename__ = 'app_permissions'
+    id = Column(Integer(), primary_key=True)
+    insert_date = Column(DateTime(), default=datetime.utcnow())
+    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
+    permission = Column(String())
+
+
+class AppServices(db_base):
+    __tablename__ = 'app_services'
+    id = Column(Integer(), primary_key=True)
+    insert_date = Column(DateTime(), default=datetime.utcnow())
+    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
+    service = Column(String())
+
+
+class AppReceivers(db_base):
+    __tablename__ = 'app_receivers'
+    id = Column(Integer(), primary_key=True)
+    insert_date = Column(DateTime(), default=datetime.utcnow())
+    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
+    receiver = Column(String())
 
 
 class Urls(db_base):
