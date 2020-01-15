@@ -100,6 +100,7 @@ class AppContents(db_base):
     app_version = Column(String())
     content_status = Column(Integer())
     insert_date = Column(DateTime(), default=datetime.utcnow())
+    update_date = Column(DateTime(), default=datetime.utcnow())
     search_vector = Column(TSVectorType('content'))
     __table_args__ = (
         Index(
@@ -204,16 +205,6 @@ class Domains(db_base):
     update_date = Column(DateTime(), onupdate=datetime.utcnow())
 
 
-class Hashes(db_base):
-    __tablename__ = 'hashes'
-    id = Column(Integer(), primary_key=True)
-    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
-    hash = Column(String())
-    hash_type = Column(String())
-    insert_date = Column(DateTime(), default=datetime.utcnow())
-    update_date = Column(DateTime(), onupdate=datetime.utcnow())
-
-
 class CreditCards(db_base):
     __tablename__ = 'creditcards'
     id = Column(Integer(), primary_key=True)
@@ -257,109 +248,10 @@ class IPBlocks(db_base):
     update_date = Column(DateTime(), onupdate=datetime.utcnow())
 
 
-class MacAddresses(db_base):
-    __tablename__ = 'macaddresses'
-    id = Column(Integer(), primary_key=True)
-    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
-    macaddress = Column(String())
-    insert_date = Column(DateTime(), default=datetime.utcnow())
-    update_date = Column(DateTime(), onupdate=datetime.utcnow())
-
-
-class BitcoinAddresses(db_base):
-    __tablename__ = 'bitcoinaddresses'
-    id = Column(Integer(), primary_key=True)
-    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
-    bitcoin_address = Column(String())
-    insert_date = Column(DateTime(), default=datetime.utcnow())
-    update_date = Column(DateTime(), onupdate=datetime.utcnow())
-
-
-class Cves(db_base):
-    __tablename__ = 'cves'
-    id = Column(Integer(), primary_key=True)
-    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
-    cve = Column(String())
-    insert_date = Column(DateTime(), default=datetime.utcnow())
-    update_date = Column(DateTime(), onupdate=datetime.utcnow())
-
-
-class GoogleAdsenseIds(db_base):
-    __tablename__ = 'googleadsense'
-    id = Column(Integer(), primary_key=True)
-    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
-    adsense_id = Column(String())
-    insert_date = Column(DateTime(), default=datetime.utcnow())
-    update_date = Column(DateTime(), onupdate=datetime.utcnow())
-
-
-class GoogleAnalyticsIds(db_base):
-    __tablename__ = 'googleanalytics'
-    id = Column(Integer(), primary_key=True)
-    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
-    analytic_id = Column(String())
-    insert_date = Column(DateTime(), default=datetime.utcnow())
-    update_date = Column(DateTime(), onupdate=datetime.utcnow())
-
-
-class TCKNs(db_base):
-    __tablename__ = 'tckns'
-    id = Column(Integer(), primary_key=True)
-    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
-    tckn = Column(String())
-    insert_date = Column(DateTime(), default=datetime.utcnow())
-    update_date = Column(DateTime(), onupdate=datetime.utcnow())
-
-
-class XmppAccounts(db_base):
-    __tablename__ = 'xmppaccounts'
-    id = Column(Integer(), primary_key=True)
-    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
-    xmpp_account = Column(String())
-    insert_date = Column(DateTime(), default=datetime.utcnow())
-    update_date = Column(DateTime(), onupdate=datetime.utcnow())
-
-
 class PhoneNumbers(db_base):
     __tablename__ = 'phonenumbers'
     id = Column(Integer(), primary_key=True)
     app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
     phone_number = Column(String())
-    insert_date = Column(DateTime(), default=datetime.utcnow())
-    update_date = Column(DateTime(), onupdate=datetime.utcnow())
-
-
-class AttackTactics(db_base):
-    __tablename__ = 'attacktactics'
-    id = Column(Integer(), primary_key=True)
-    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
-    attack_tactic = Column(String())
-    insert_date = Column(DateTime(), default=datetime.utcnow())
-    update_date = Column(DateTime(), onupdate=datetime.utcnow())
-
-
-class AttackTechniques(db_base):
-    __tablename__ = 'attacktechniques'
-    id = Column(Integer(), primary_key=True)
-    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
-    attach_techniques = Column(String())
-    insert_date = Column(DateTime(), default=datetime.utcnow())
-    update_date = Column(DateTime(), onupdate=datetime.utcnow())
-
-
-class Asns(db_base):
-    __tablename__ = 'asns'
-    id = Column(Integer(), primary_key=True)
-    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
-    asn = Column(String())
-    insert_date = Column(DateTime(), default=datetime.utcnow())
-    update_date = Column(DateTime(), onupdate=datetime.utcnow())
-
-
-class UserAgents(db_base):
-    __tablename__ = 'useragents'
-    id = Column(Integer(), primary_key=True)
-    app_id = Column(Integer(), ForeignKey(Apps.id), nullable=False, index=True)
-    user_agent = Column(String())
     insert_date = Column(DateTime(), default=datetime.utcnow())
     update_date = Column(DateTime(), onupdate=datetime.utcnow())
