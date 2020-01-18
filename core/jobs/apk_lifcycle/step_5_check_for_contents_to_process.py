@@ -32,11 +32,10 @@ def main():
         UrlUtils.save_urls(app_id, iocs.get('urls'))
         PhoneNumberUtils.save(app_id, iocs.get('phone_numbers'))
 
-        item.status = ContentStatus.PROCESSED.value
+        item.content_status = ContentStatus.PROCESSED.value
         item.update_date = datetime.utcnow()
+        db_session.commit()
         print(f"processing for app_id: '{item.app_id}', file: '{item.content_file}' finished, Took '{Tools.get_elapsed_time(start_time)}' seconds")
-    print("Committing database for processed files")
-    db_session.commit()
 
 
 if __name__ == '__main__':
