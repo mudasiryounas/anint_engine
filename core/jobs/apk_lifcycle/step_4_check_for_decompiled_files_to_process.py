@@ -118,7 +118,7 @@ def process_app(package, version):
 def main():
     start_time = time.time()
     print(f"Check for apps to process job started")
-    apps_to_process = db_session.query(AppsToFollow).filter_by(status=AppsToFollowStatus.DECOMPILED.value).all()
+    apps_to_process = db_session.query(AppsToFollow).filter_by(app_to_follow_status=AppsToFollowStatus.DECOMPILED.value).all()
     if apps_to_process:
         apps_to_process_tuple = [(item.package, item.current_version) for item in apps_to_process]
         for item in apps_to_process:
@@ -130,5 +130,4 @@ def main():
 
 
 if __name__ == '__main__':
-    # main()
-    process_other_files('com.inovel.app.yemeksepeti', '/tmp/anint/decompiled_apks/com.inovel.app.yemeksepeti/3.1.9')
+    main()
