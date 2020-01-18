@@ -64,6 +64,22 @@ class AppUtils:
             return app
 
     @staticmethod
+    def delete_apps(package_list):
+        for package in package_list:
+            app = db_session.query(Apps).filter_by(package=package).first()
+            app_activities = db_session.query(AppActivities).filter_by(app_id=app.id).all()
+            db_session.delete(app_activities)
+
+
+            db_session.delete(app)
+
+
+
+            db_session.commit()
+        return True
+
+
+    @staticmethod
     def add_app_history(package, app_before_update, messages):
         # keep application history
         if len(messages) > 0:

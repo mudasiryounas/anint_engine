@@ -9,11 +9,13 @@ from core.db_models import Domains
 
 class DomainUtils:
     @staticmethod
-    def save(app_id, domain_list):
+    def save_domains(app_id, domain_list):
         for domain in domain_list:
-            domain_entity = Domains(app_id=app_id,
-                                    domain=domain,
-                                    insert_date=datetime.utcnow(),
-                                    update_date=datetime.utcnow())
-            db_session.add(domain_entity)
+            domain_entity = db_session.query(Domains).filter_by(app_id=app_id).filter_by(domain=domain).first()
+            if domain_entity is None:
+                domain_entity = Domains(app_id=app_id,
+                                        domain=domain,
+                                        insert_date=datetime.utcnow(),
+                                        update_date=datetime.utcnow())
+                db_session.add(domain_entity)
         db_session.commit()

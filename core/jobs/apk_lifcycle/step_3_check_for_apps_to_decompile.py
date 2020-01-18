@@ -9,8 +9,9 @@ from core import db_session
 from core.Enums import AppsToFollowStatus
 from core.db_models import AppsToFollow
 
-DECOMPILED_FILES_OUTPUT_FOLDER = '/tmp/anint/decompiled_apks'
 DOWNLOADED_APK_FOLDER = '/tmp/anint/downloaded_apks'
+DECOMPILED_FILES_OUTPUT_FOLDER = '/tmp/anint/decompiled_apks'
+
 
 
 def decompile_app(package, version):
@@ -36,7 +37,7 @@ def decompile_app(package, version):
 def main():
     start_time = time.time()
     print(f"Check for apps to decompile job started")
-    apps_to_decompile = db_session.query(AppsToFollow).filter_by(status=AppsToFollowStatus.DOWNLOADED.value).all()
+    apps_to_decompile = db_session.query(AppsToFollow).filter_by(app_to_follow_status=AppsToFollowStatus.DOWNLOADED.value).all()
     if apps_to_decompile:
         apps_to_decompile_tuple = [(item.package, item.current_version) for item in apps_to_decompile]
         for item in apps_to_decompile:

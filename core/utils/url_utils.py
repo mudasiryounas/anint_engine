@@ -9,11 +9,13 @@ from core.db_models import Urls
 
 class UrlUtils:
     @staticmethod
-    def save(app_id, url_list):
+    def save_urls(app_id, url_list):
         for url in url_list:
-            url_entity = Urls(app_id=app_id,
-                              url=url,
-                              insert_date=datetime.utcnow(),
-                              update_date=datetime.utcnow())
-            db_session.add(url_entity)
+            url_entity = db_session.query(Urls).filter_by(app_id=app_id).filter_by(url=url).first()
+            if url_entity is None:
+                url_entity = Urls(app_id=app_id,
+                                  url=url,
+                                  insert_date=datetime.utcnow(),
+                                  update_date=datetime.utcnow())
+                db_session.add(url_entity)
         db_session.commit()

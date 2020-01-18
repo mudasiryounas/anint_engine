@@ -23,8 +23,8 @@ def main():
         IpUtils.save_ipv4s(app_id, iocs.get('ipv4s'))
         IpUtils.save_ipv6s(app_id, iocs.get('ipv6s'))
         IpUtils.save_ipblocks(app_id, iocs.get('ipv4_cidrs'))
-        DomainUtils.save(app_id, iocs.get('domains'))
-        UrlUtils.save(app_id, iocs.get('urls'))
+        DomainUtils.save_domains(app_id, iocs.get('domains'))
+        UrlUtils.save_urls(app_id, iocs.get('urls'))
         PhoneNumberUtils.save(app_id, iocs.get('phone_numbers'))
 
         item.status = ContentStatus.PROCESSED.value
